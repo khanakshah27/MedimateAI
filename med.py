@@ -18,7 +18,6 @@ model = genai.GenerativeModel("models/gemini-2.5-flash")
 
 def med_response(image):
     try:
-         try:
         response = model.generate_content(
             f"Analyze the medical image and provide a detailed report: {image}",
             generation_config={
