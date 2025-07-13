@@ -18,10 +18,13 @@ model = genai.GenerativeModel("models/gemini-2.5-flash")
 
 def med_response(image):
     try:
-        response=model.generate_content(
-            prompt=f"Analyze the medical image and provide a detailed report: {image}",
-            max_output_tokens=1000,
-            temperature=0.5,
+         try:
+        response = model.generate_content(
+            f"Analyze the medical image and provide a detailed report: {image}",
+            generation_config={
+                "max_output_tokens": 1000,
+                "temperature": 0.5
+            }
         )
         return response.text.strip()
     except Exception as e:
@@ -30,11 +33,13 @@ def med_response(image):
     
 def clarify_prescription(image):
     try:
-        response=model.generate_content(
-            prompt=f"Clarify the prescription details from the medical image: {image}",
-            max_output_tokens=500,
-            temperature=0.5,
-        )
+        response = model.generate_content(
+    f"Clarify the prescription details from the medical image: {image}",
+    generation_config={
+        "max_output_tokens": 500,
+        "temperature": 0.5
+    }
+)
         return response.text.strip()
     except Exception as e:
         st.error(f"Error clarifying prescription: {e}")
