@@ -40,7 +40,7 @@ if image:
         if st.button("Translate"):
             translated_text = translate_output(st.session_state.analysis, target_language)
             if translated_text:
-                st.subheader(f"🌍 Translated Analysis ({target_language})")
+                st.subheader(f"Translated Analysis ({target_language})")
                 st.write(translated_text)
 
 else:
