@@ -51,11 +51,14 @@ def clarify_prescription(image_file):
                 "temperature": 0.5
             }
         )
-        return response.text.strip()
+       if response.parts:
+            return response.text.strip()
+        else:
+            st.warning("No content returned. It may have been blocked.")
+            return None
     except Exception as e:
         st.error(f"Error clarifying prescription: {e}")
         return None
-
     
 def translate_output(text, target_language):
     try:
