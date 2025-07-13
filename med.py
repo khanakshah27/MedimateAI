@@ -2,7 +2,7 @@ import os
 import streamlit as st
 import google.generativeai as genai
     
-from PIL import Image
+
 
 def get_gemini_api_key():
     """Get Gemini API key from Streamlit secrets or environment variables."""
@@ -18,10 +18,10 @@ def get_gemini_api_key():
 genai.configure(api_key=get_gemini_api_key())
 model = genai.GenerativeModel("models/gemini-2.5-flash")
 
+from PIL import Image
 def med_response(image_file):
     try:
         image = Image.open(image_file)
-
         response = model.generate_content(
             parts=[
                 image,
@@ -32,11 +32,16 @@ def med_response(image_file):
                 "temperature": 0.5
             }
         )
-        return response.text.strip()
+        if response.parts:
+            return response.text.strip()
+        else:
+            st.warning("No content returned. It may have been blocked.")
+            return None
     except Exception as e:
         st.error(f"Error generating response: {e}")
         return None
-
+        
+from PIL import Image       
 def clarify_prescription(image_file):
     try:
         image = Image.open(image_file)
@@ -59,12 +64,22 @@ def clarify_prescription(image_file):
     except Exception as e:
         st.error(f"Error clarifying prescription: {e}")
         return None
-    
 def translate_output(text, target_language):
     try:
         prompt = f"Translate the following medical summary into {target_language}:\n\n{text}"
-        response = model.generate_content(prompt)
-        return response.text.strip()
+        response = model.generate_content(
+            prompt,
+            generation_config={
+                "max_output_tokens": 500,
+                "temperature": 0.5
+            }
+        )
+        if response.parts:
+            return response.text.strip()
+        else:
+            st.warning("No content returned. It may have been blocked.")
+            return None
     except Exception as e:
         st.error(f"Error translating text: {e}")
         return None
+
