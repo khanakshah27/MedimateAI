@@ -1,9 +1,6 @@
 import subprocess
 import streamlit as st
 
-import sys
-subprocess.run([sys.executable, "-m", "pip", "install", "--upgrade", "google-generativeai==0.8.5"])
-
 
 import streamlit as st 
 from med import get_gemini_api_key, med_response, clarify_prescription, translate_output
