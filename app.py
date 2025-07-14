@@ -25,7 +25,7 @@ if st.button("Get Medicine Info"):
         st.session_state.last_output = info
 if st.button("Get Medicinal Analysis"):
     analysis=med_analysis(medicinal_input)
-     if analysis:
+    if analysis:
         st.subheader("Medicinal Analysis")
         st.write(analysis)
         st.session_state.last_output = analysis
