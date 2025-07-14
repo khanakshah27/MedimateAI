@@ -1,11 +1,14 @@
-
-
 import os
+import subprocess
+import sys
 import streamlit as st
 import google.generativeai as genai
 from PIL import Image
 
+subprocess.run([sys.executable, "-m", "pip", "install", "--upgrade", "google-generativeai==0.8.5"])
+
 st.write("Gemini SDK Version:", genai.__version__)
+
 
 
 def get_gemini_api_key():
