@@ -5,7 +5,8 @@ import streamlit as st
 import google.generativeai as genai
 from PIL import Image
 
-st.write("Gemini SDK Version:", google.generativeai.__version__)
+st.write("Gemini SDK Version:", genai.__version__)
+
 
 def get_gemini_api_key():
     """Get Gemini API key from Streamlit secrets or environment variables."""
