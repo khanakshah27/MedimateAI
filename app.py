@@ -1,54 +1,49 @@
-import subprocess
 import streamlit as st
+from med import extract_text, clarify_prescription, med_analysis, translate_output
 
+INDIAN_LANGUAGES = [
+    "English", "Assamese", "Bengali", "Bodo", "Dogri", "Gujarati", "Hindi", "Kannada",
+    "Kashmiri", "Konkani", "Maithili", "Malayalam", "Manipuri", "Marathi", "Nepali", 
+    "Odia", "Punjabi", "Sanskrit", "Santali", "Sindhi", "Tamil", "Telugu", "Urdu"
+]
 
-import streamlit as st 
-from med import get_gemini_api_key, med_response, clarify_prescription, translate_output
+st.set_page_config(page_title="MediMate: Medical Image Analyzer", layout="wide")
+st.title("MedimateAI — Medical Image Analysis")
+st.write("Upload a prescription or medical note image to extract and analyze.")
 
-st.set_page_config(page_title="Medical Image Analysis", layout="wide")
-st.title("Medical Image Analysis")
-st.write("Upload a medical image to clarify prescriptions, get analysis, and translate results.")
+image = st.file_uploader("Upload an image", type=["jpg", "jpeg", "png"])
 
-
-image = st.file_uploader("Upload a medical image (jpg, jpeg, png):", type=["jpg", "jpeg", "png"])
 if image:
     st.image(image, caption="Uploaded Image", use_column_width=True)
 
+    if st.button("Extract & Clarify Prescription"):
+        extracted_text = extract_text(image)
+        if extracted_text.strip() == "":
+            st.warning("No text detected in the image.")
+        else:
+            st.subheader("Extracted Text")
+            st.code(extracted_text)
 
-    if st.button("Clarify Prescription"):
-        st.session_state.show_prescription = True
-        st.session_state.prescription = clarify_prescription(image)
+            clarified = clarify_prescription(extracted_text)
+            if clarified:
+                st.subheader("Clarified Prescription")
+                st.write(clarified)
 
-    if st.session_state.get("show_prescription") and st.session_state.get("prescription"):
-        st.subheader("Prescription Details")
-        st.write(st.session_state.prescription)
+            analysis = med_analysis(extracted_text)
+            if analysis:
+                st.subheader("Medical Summary")
+                st.write(analysis)
 
-      
-        if st.button("Medical Analysis"):
-            st.session_state.show_analysis = True
-            st.session_state.analysis = med_response(image)
+                target_language = st.selectbox("Translate Summary To", INDIAN_LANGUAGES)
 
-
-    if st.session_state.get("show_analysis") and st.session_state.get("analysis"):
-        st.subheader("Medical Analysis")
-        st.write(st.session_state.analysis)
-
-   
-        target_language = st.selectbox(
-            "Select Language for Translation", 
-            ["English", "Assamese", "Bengali", "Bodo", "Dogri", "Gujarati", "Hindi", "Kannada",
-             "Kashmiri", "Konkani", "Maithili", "Malayalam", "Manipuri", "Marathi", "Nepali", 
-             "Odia", "Punjabi", "Sanskrit", "Santali", "Sindhi", "Tamil", "Telugu", "Urdu"]
-        )
-
-        if st.button("Translate"):
-            translated_text = translate_output(st.session_state.analysis, target_language)
-            if translated_text:
-                st.subheader(f"Translated Analysis ({target_language})")
-                st.write(translated_text)
-
+                if st.button("Translate"):
+                    translated = translate_output(analysis, target_language)
+                    if translated:
+                        st.subheader(f"Translated Summary ({target_language})")
+                        st.write(translated)
+                    else:
+                        st.warning("Translation failed.")
 else:
     st.info("Please upload a valid image to begin.")
 
-      
 
