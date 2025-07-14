@@ -20,7 +20,7 @@ def get_gemini_api_key():
         return api_key
 
 genai.configure(api_key=get_gemini_api_key())
-model = genai.GenerativeModel("models/gemini-2.5-flash")
+model = genai.GenerativeModel("gemini-pro-vision")
 
 
 def med_response(image_file):
