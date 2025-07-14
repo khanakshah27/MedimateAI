@@ -1,29 +1,32 @@
-# Medimate
+MediMate AI — Rural Medicine Assistant
 
-MediMate – AI-Powered Prescription Assistant
-
-MediMate is a Streamlit-based web application that uses Google’s Gemini API to analyze handwritten medical prescriptions, clarify their contents in simple language, and translate the explanation into various Indian languages — making healthcare more accessible and understandable.
+MediMate is an AI-powered tool designed to assist people, especially in rural or underserved areas, in understanding their prescribed medicines and related health conditions in simple language.
 
 Features
 
-- Image Upload: Accepts handwritten prescription images from users.
-- Gemini AI Integration: Uses Google's Gemini 2.5 Flash model for prescription analysis.
-- Simplified Output: Converts complex medical terms into patient-friendly language.
-- Multilingual Support: Translates the summary into over 20 Indian languages.
-- Streamlit Interface: Fast, interactive, and easy-to-use frontend.
+- Medicine Info Lookup:  
+  Get plain-language explanations for medicines including their use, dosage, and warnings.
+
+- Disease Analysis:  
+  Provides detailed, non-technical insight into the conditions these medicines treat — including symptoms, causes, treatments, and prevention.
+
+- Indian Language Translation:  
+  Translate all output into 20+ Indian languages like Hindi, Tamil, Bengali, Kannada, Marathi, etc.
+
+- Streamlit Interface:  
+  Clean, responsive, and easy to use for people with limited tech literacy.
+
+Real-world Use Cases
+
+- A person from a small town receives a prescription but doesn’t understand what the medicine is for.
+- A family caregiver wants to explain an illness in their native language to elders.
+- Healthcare NGOs use this to simplify medical communication.
 
 Tech Stack
 
 - Frontend: Streamlit
-- Backend: Python
-- AI Model: Gemini 2.5 Flash (generative-language API)
-- Libraries:
-  - google-generativeai
-  - streamlit
-  - os
+- Backend AI: Gemini 2.5 Flash (google-generativeai)
+- Translation: Gemini's multilingual capabilities
+- Deployment: Streamlit Cloud
 
-Example Workflow
 
-1. Upload a photo of your handwritten medical prescription.
-2. (Optional) Choose a preferred Indian language for output.
-3. The app returns a simplified and translated explanation of your prescription.
