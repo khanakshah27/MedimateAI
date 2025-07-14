@@ -1,3 +1,11 @@
+import subprocess
+import streamlit as st
+
+# Show installed packages (debug only)
+packages = subprocess.run(["pip", "freeze"], capture_output=True, text=True)
+st.code(packages.stdout)
+
+
 import streamlit as st 
 from med import get_gemini_api_key, med_response, clarify_prescription, translate_output
 
