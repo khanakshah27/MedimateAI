@@ -1,4 +1,4 @@
-MediMate AI — Rural Medicine Assistant
+# MediMate AI — Rural Medicine Assistant
 
 MediMate is an AI-powered tool designed to assist people, especially in rural or underserved areas, in understanding their prescribed medicines and related health conditions in simple language.
 
