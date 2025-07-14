@@ -1,9 +1,8 @@
 import subprocess
 import streamlit as st
 
-# Show installed packages (debug only)
-packages = subprocess.run(["pip", "freeze"], capture_output=True, text=True)
-st.code(packages.stdout)
+import sys
+subprocess.run([sys.executable, "-m", "pip", "install", "--upgrade", "google-generativeai==0.8.5"])
 
 
 import streamlit as st 
