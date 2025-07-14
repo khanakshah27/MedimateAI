@@ -1,5 +1,5 @@
 import streamlit as st
-from med import extract_text, clarify_prescription, med_analysis, translate_output
+from med import get_med_info, med_analysis, translate_output
 
 INDIAN_LANGUAGES = [
     "English", "Assamese", "Bengali", "Bodo", "Dogri", "Gujarati", "Hindi", "Kannada",
@@ -7,43 +7,33 @@ INDIAN_LANGUAGES = [
     "Odia", "Punjabi", "Sanskrit", "Santali", "Sindhi", "Tamil", "Telugu", "Urdu"
 ]
 
-st.set_page_config(page_title="MediMate: Medical Image Analyzer", layout="wide")
-st.title("MedimateAI — Medical Image Analysis")
-st.write("Upload a prescription or medical note image to extract and analyze.")
+st.set_page_config(page_title="MedimateAI: Medicinal Assistant", layout="wide")
+st.title("MedimateAI — Medical Assistant")
+st.write("Enter medicine names below to get information and analysis.")
 
-image = st.file_uploader("Upload an image", type=["jpg", "jpeg", "png"])
+medicine_input=st.text_area("Enter name of medicine prescribed: ")
+selected_language=st.selectbox("Choose Language for Translation", INDIAN_LANGUAGES)
 
-if image:
-    st.image(image, caption="Uploaded Image", use_column_width=True)
+if "last_output" not in st.session_state:
+    st.session_state.last_output = ""
 
-    if st.button("Extract & Clarify Prescription"):
-        extracted_text = extract_text(image)
-        if extracted_text.strip() == "":
-            st.warning("No text detected in the image.")
-        else:
-            st.subheader("Extracted Text")
-            st.code(extracted_text)
-
-            clarified = clarify_prescription(extracted_text)
-            if clarified:
-                st.subheader("Clarified Prescription")
-                st.write(clarified)
-
-            analysis = med_analysis(extracted_text)
-            if analysis:
-                st.subheader("Medical Summary")
-                st.write(analysis)
-
-                target_language = st.selectbox("Translate Summary To", INDIAN_LANGUAGES)
-
-                if st.button("Translate"):
-                    translated = translate_output(analysis, target_language)
-                    if translated:
-                        st.subheader(f"Translated Summary ({target_language})")
-                        st.write(translated)
-                    else:
-                        st.warning("Translation failed.")
-else:
-    st.info("Please upload a valid image to begin.")
-
-
+if st.button("Get Medicine Info"):
+    info=get_med_info(medicine_input)
+    if info:
+        st.subheader("Medicine Info")
+        st.write(info)
+        st.session_state.last_output = info
+if st.button("Get Medicinal Analysis"):
+    analysis=med_analysis(medicinal_input)
+     if analysis:
+        st.subheader("Medicinal Analysis")
+        st.write(analysis)
+        st.session_state.last_output = analysis
+if st.button("Translate"):
+    if st.session_state.last_output:
+        translated = translate_output(st.session_state.last_output, selected_language)
+        if translated:
+            st.subheader(f"Translated Output ({selected_language})")
+            st.write(translated)
+    else:
+        st.warning("Please generate info or analysis first before translating.")
