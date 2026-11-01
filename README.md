@@ -1,32 +1,41 @@
 # MediMate AI — Rural Medicine Assistant
 
-MediMate is an AI-powered tool designed to assist people, especially in rural or underserved areas, in understanding their prescribed medicines and related health conditions in simple language.
+MediMate explains prescribed medicines and the conditions they treat in plain language, and translates the answer into 20+ Indian languages. Built to help people in rural and underserved areas understand their care.
 
-Features
+## Features
 
-- Medicine Info Lookup:  
-  Get plain-language explanations for medicines including their use, dosage, and warnings.
+* **Medicine info** — use, common dosage and warnings in simple words
+* **Condition analysis** — what the illness is, symptoms, causes, treatment and prevention
+* **Translation** — Hindi, Tamil, Bengali, Kannada, Marathi and more
 
-- Disease Analysis:  
-  Provides detailed, non-technical insight into the conditions these medicines treat — including symptoms, causes, treatments, and prevention.
+## Architecture
 
-- Indian Language Translation:  
-  Translate all output into 20+ Indian languages like Hindi, Tamil, Bengali, Kannada, Marathi, etc.
+| Part | Tech | Host |
+| --- | --- | --- |
+| `frontend/` | Static HTML/CSS/JS (Fraunces + Nunito Sans, pastel green) | Vercel |
+| `app.py`, `med.py` | Flask API calling Gemini 2.5 Flash | Render |
 
-- Streamlit Interface:  
-  Clean, responsive, and easy to use for people with limited tech literacy.
+**Live demo:** _add your Vercel URL here_
 
-Real-world Use Cases
+## Run locally
 
-- A person from a small town receives a prescription but doesn’t understand what the medicine is for.
-- A family caregiver wants to explain an illness in their native language to elders.
-- Healthcare NGOs use this to simplify medical communication.
+```bash
+pip install -r requirements.txt
+export GEMINI_API_KEY="your-key"
+python app.py            # API on http://127.0.0.1:5000
+```
 
-Tech Stack
+Open `frontend/index.html` after setting `window.API_BASE = "http://127.0.0.1:5000"` in the console (or edit `API_BASE`).
 
-- Frontend: Streamlit
-- Backend AI: Gemini 2.5 Flash (google-generativeai)
-- Translation: Gemini's multilingual capabilities
-- Deployment: Streamlit Cloud
+API: `POST /api/info` and `/api/analysis` with `{"medicine": "..."}`; `POST /api/translate` with `{"text": "...", "language": "Hindi"}`.
 
+## Deploy
 
+1. **Render** — New → Blueprint → this repo (reads `render.yaml`). Add the `GEMINI_API_KEY` environment variable when prompted. Note the service URL.
+2. In `frontend/index.html`, set `API_BASE` to that URL, commit and push.
+3. **Vercel** — import the repo, set **Root Directory** to `frontend`, framework **Other**.
+4. Optionally set `ALLOWED_ORIGINS` on Render to your Vercel URL.
+
+Never commit your API key. Render's free tier sleeps when idle, so the first request can be slow.
+
+> MediMate shares general information only and is not a substitute for professional medical advice.

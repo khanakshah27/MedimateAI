@@ -1,32 +1,43 @@
-import streamlit as st
-import google.generativeai as genai
 import os
 
-def get_gemini_api_key():
-    try:
-        return st.secrets["GEMINI_API_KEY"]
-    except (KeyError, FileNotFoundError):
+import google.generativeai as genai
+
+DISCLAIMER = (
+    "Write for a layperson in simple, calm language. Use short sections with bold headings "
+    "and bullet points. End with one line reminding the reader to consult a doctor or "
+    "pharmacist before changing any treatment."
+)
+
+_model = None
+
+
+def get_model():
+    """Configure Gemini lazily so the server can boot (and report errors) without a key."""
+    global _model
+    if _model is None:
         api_key = os.getenv("GEMINI_API_KEY")
         if not api_key:
-            st.error("GEMINI_API_KEY not found. Please set it.")
-            st.stop()
-        return api_key
+            raise RuntimeError("GEMINI_API_KEY is not set on the server.")
+        genai.configure(api_key=api_key)
+        _model = genai.GenerativeModel("models/gemini-2.5-flash")
+    return _model
 
-genai.configure(api_key=get_gemini_api_key())
-model = genai.GenerativeModel("models/gemini-2.5-flash")
+
+def _generate(prompt):
+    response = get_model().generate_content(prompt)
+    return response.text.strip() if response.parts else "No response."
+
 
 def get_med_info(text):
-    try:
-        prompt = f"Give simple, layman-friendly information about the following medicines:\n{text}\nInclude their use, common dosage, and warnings."
-        response = model.generate_content(prompt)
-        return response.text.strip() if response.parts else "No response."
-    except Exception as e:
-        st.error(f"Error fetching medicine info: {e}")
-        return None
+    return _generate(
+        f"Give simple, layman-friendly information about the following medicines:\n{text}\n"
+        f"Include their use, common dosage, and warnings.\n{DISCLAIMER}"
+    )
+
 
 def med_analysis(text):
-    try:
-        prompt = f"""Based on the following medicine names: {text}, identify the disease(s) or medical conditions they are commonly used to treat.
+    return _generate(
+        f"""Based on the following medicine names: {text}, identify the disease(s) or medical conditions they are commonly used to treat.
 Then, provide a detailed explanation of the condition(s), including:
 - What it is
 - Common symptoms
@@ -36,18 +47,11 @@ Then, provide a detailed explanation of the condition(s), including:
 - Preventive measures
 
 Explain in simple, non-technical terms.
-"""
-        response = model.generate_content(prompt)
-        return response.text.strip() if response.parts else "No response."
-    except Exception as e:
-        st.error(f"Error generating analysis: {e}")
-        return None
+{DISCLAIMER}"""
+    )
+
 
 def translate_output(text, target_language):
-    try:
-        prompt = f"Translate the following text to {target_language}:\n\n{text}"
-        response = model.generate_content(prompt)
-        return response.text.strip() if response.parts else "No response."
-    except Exception as e:
-        st.error(f"Error translating text: {e}")
-        return None
+    return _generate(
+        f"Translate the following text to {target_language}. Keep the markdown formatting:\n\n{text}"
+    )

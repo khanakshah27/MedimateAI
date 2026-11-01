@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>MediMate AI — Medicine, Made Gentle</title>
+  <meta name="description" content="Understand your prescription in plain language, in 20+ Indian languages.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400;1,9..144,500&family=Nunito+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --forest: #1f4d3a;
+      --forest-soft: #4a6b5a;
+      --sage: #cfe5d6;
+      --mint: #e7f4eb;
+      --mist: #f5faf6;
+      --leaf: #8fc4a2;
+      --blush: #fbf6ef;
+      --serif: 'Fraunces', Georgia, serif;
+      --sans: 'Nunito Sans', system-ui, sans-serif;
+    }
+    * { box-sizing: border-box; margin: 0; }
+    body {
+      font-family: var(--sans); color: var(--forest); line-height: 1.65; min-height: 100vh;
+      background:
+        radial-gradient(55rem 38rem at 0% -10%, var(--sage) 0%, transparent 60%),
+        radial-gradient(45rem 35rem at 100% 100%, var(--mint) 0%, transparent 60%),
+        var(--mist);
+    }
+    header { max-width: 1060px; margin: 0 auto; padding: 26px 24px; display: flex; justify-content: space-between; align-items: center; }
+    .brand { display: flex; align-items: center; gap: 10px; font-family: var(--serif); font-size: 1.5rem; font-weight: 600; }
+    .brand svg { width: 30px; height: 30px; }
+    .brand span { color: var(--leaf); }
+    header a { color: var(--forest-soft); text-decoration: none; font-size: .9rem; }
+    header a:hover { color: var(--forest); }
+
+    .hero { max-width: 760px; margin: 0 auto; padding: 48px 24px 24px; text-align: center; }
+    .eyebrow { text-transform: uppercase; letter-spacing: .24em; font-size: .72rem; color: var(--forest-soft); }
+    h1 { font-family: var(--serif); font-weight: 500; line-height: 1.08; font-size: clamp(2.6rem, 7.5vw, 4.6rem); margin: 16px 0 18px; }
+    h1 em { font-style: italic; color: #5a9a73; }
+    .lede { color: var(--forest-soft); font-size: 1.08rem; max-width: 540px; margin: 0 auto; }
+
+    .card {
+      max-width: 720px; margin: 34px auto 0; padding: 34px; text-align: left;
+      background: rgba(255,255,255,.88); backdrop-filter: blur(8px);
+      border: 1px solid var(--sage); border-radius: 28px;
+      box-shadow: 0 24px 60px -26px rgba(31,77,58,.3);
+    }
+    label { display: block; font-family: var(--serif); font-style: italic; font-size: 1.3rem; margin-bottom: 10px; }
+    textarea, select {
+      width: 100%; font: 1rem var(--sans); color: var(--forest);
+      background: var(--blush); border: 1.5px solid var(--sage); border-radius: 14px; padding: 14px 16px;
+      transition: border-color .2s, box-shadow .2s;
+    }
+    textarea { min-height: 92px; resize: vertical; }
+    textarea:focus, select:focus { outline: none; border-color: var(--forest); box-shadow: 0 0 0 4px var(--mint); }
+    .actions { display: flex; gap: 12px; margin-top: 16px; flex-wrap: wrap; }
+    button {
+      font: 700 .92rem var(--sans); letter-spacing: .03em; cursor: pointer; border-radius: 999px;
+      padding: 13px 26px; border: 1.5px solid var(--forest); transition: transform .2s, box-shadow .2s, background .2s;
+    }
+    button:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 10px 22px -10px rgba(31,77,58,.55); }
+    button:disabled { opacity: .55; cursor: wait; }
+    .primary { background: var(--forest); color: var(--mint); }
+    .ghost { background: transparent; color: var(--forest); }
+    .ghost:hover:not(:disabled) { background: var(--mint); }
+    .hint { margin-top: 14px; font-size: .82rem; color: var(--forest-soft); }
+
+    #result { display: none; margin-top: 28px; padding: 28px; border-radius: 22px; background: var(--mint); border: 1px solid var(--sage); animation: rise .5s ease; }
+    #result h3.title { font-family: var(--serif); font-weight: 500; font-size: 1.7rem; margin-bottom: 12px; display: flex; align-items: center; gap: 10px; }
+    #result h3.title svg { width: 24px; height: 24px; flex: none; }
+    #body h4 { font-family: var(--serif); font-size: 1.15rem; font-weight: 600; margin: 18px 0 4px; }
+    #body p { margin: 8px 0; }
+    #body ul { margin: 6px 0 6px 22px; }
+    #body li { margin: 4px 0; }
+    #body.loading { color: var(--forest-soft); font-style: italic; }
+    #body.error { color: #8a3b3b; }
+    .translate { margin-top: 24px; padding-top: 20px; border-top: 1px dashed var(--leaf); display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
+    .translate select { flex: 1; min-width: 160px; width: auto; }
+    @keyframes rise { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+
+    .steps { max-width: 940px; margin: 80px auto 0; padding: 0 24px; display: grid; gap: 20px; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); }
+    .steps div { padding: 22px 4px; border-top: 1px solid var(--leaf); }
+    .steps h4 { font-family: var(--serif); font-size: 1.4rem; font-weight: 600; margin-bottom: 4px; }
+    .steps p { font-size: .92rem; color: var(--forest-soft); }
+    footer { max-width: 640px; text-align: center; margin: 72px auto 40px; padding: 0 24px; font-family: var(--serif); font-style: italic; color: var(--forest-soft); }
+    footer small { display: block; margin-top: 10px; font: .78rem var(--sans); font-style: normal; }
+    @media (max-width: 520px) { .card { padding: 22px; border-radius: 22px; } header a { display: none; } }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="brand">
+      <svg viewBox="0 0 32 32" fill="none" aria-hidden="true"><rect x="2" y="12" width="28" height="9" rx="4.5" transform="rotate(-35 16 16)" fill="#cfe5d6" stroke="#1f4d3a" stroke-width="1.6"/><path d="M12 22.5 20 9.5" stroke="#1f4d3a" stroke-width="1.6"/></svg>
+      MediMate<span>.</span>
+    </div>
+    <a href="https://github.com/khanakshah27/MedimateAI">GitHub</a>
+  </header>
+
+  <section class="hero">
+    <p class="eyebrow">Plain words &middot; Every language &middot; Every village</p>
+    <h1>Medicine, <em>made gentle</em> to understand.</h1>
+    <p class="lede">Enter a prescribed medicine and learn what it is for, how it is taken and what to watch for, then read it in your own language.</p>
+
+    <div class="card">
+      <label for="medicine">Which medicine were you prescribed?</label>
+      <textarea id="medicine" maxlength="500" placeholder="e.g. Paracetamol, Amoxicillin"></textarea>
+      <div class="actions">
+        <button class="primary" id="btnInfo">About this medicine</button>
+        <button class="ghost" id="btnAnalysis">Understand the condition</button>
+      </div>
+      <p class="hint">Separate several medicines with commas.</p>
+
+      <div id="result" role="status" aria-live="polite">
+        <h3 class="title">
+          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 19C5 10 11 4 20 4c0 9-6 15-15 15Z" fill="#8fc4a2" stroke="#1f4d3a" stroke-width="1.5"/><path d="M5 19 14 10" stroke="#1f4d3a" stroke-width="1.5"/></svg>
+          <span id="title"></span>
+        </h3>
+        <div id="body"></div>
+        <div class="translate" id="translateBox" hidden>
+          <select id="language" aria-label="Translate to"></select>
+          <button class="primary" id="btnTranslate">Translate</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="steps">
+    <div><h4>Name it</h4><p>Type the medicine from your prescription.</p></div>
+    <div><h4>Understand it</h4><p>Get its use, dosage and cautions, and what the illness itself means.</p></div>
+    <div><h4>Hear it kindly</h4><p>Read everything in Hindi, Tamil, Bengali and 20 more languages.</p></div>
+  </section>
+
+  <footer>
+    &ldquo;The art of medicine consists of amusing the patient while nature cures the disease.&rdquo;
+    <small>MediMate AI shares general information only and is not a substitute for a doctor or pharmacist. Always follow your prescriber&rsquo;s advice.</small>
+  </footer>
+
+  <script>
+    // Backend (Render). Replace if your Render URL differs.
+    const API_BASE = window.API_BASE || "https://medimate-api.onrender.com";
+    const $ = id => document.getElementById(id);
+    let lastText = "";
+
+    // Wake the free-tier server as soon as the page opens.
+    const warm = fetch(API_BASE + "/health").catch(() => {});
+    fetch(API_BASE + "/api/languages").then(r => r.json()).then(list => {
+      $("language").innerHTML = list.map(l => `<option>${l}</option>`).join("");
+    }).catch(() => {
+      ["English","Hindi","Bengali","Gujarati","Kannada","Malayalam","Marathi","Punjabi","Tamil","Telugu","Urdu"]
+        .forEach(l => $("language").add(new Option(l)));
+    });
+
+    const esc = s => s.replace(/[&<>"']/g, c => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" }[c]));
+    const inline = s => esc(s).replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>").replace(/\*(.+?)\*/g, "<em>$1</em>");
+
+    // Minimal, safe markdown: headings, bullets, bold, paragraphs.
+    function render(md) {
+      let html = "", inList = false;
+      const close = () => { if (inList) { html += "</ul>"; inList = false; } };
+      for (const raw of md.split("\n")) {
+        const line = raw.trim();
+        const h = line.match(/^#{1,6}\s+(.*)/), b = line.match(/^[*\-•]\s+(.*)/);
+        if (b) { if (!inList) { html += "<ul>"; inList = true; } html += `<li>${inline(b[1])}</li>`; continue; }
+        close();
+        if (h) html += `<h4>${inline(h[1])}</h4>`;
+        else if (/^\*\*[^*]+\*\*:?$/.test(line)) html += `<h4>${inline(line.replace(/\*\*|:$/g, ""))}</h4>`;
+        else if (line) html += `<p>${inline(line)}</p>`;
+      }
+      close();
+      return html;
+    }
+
+    function show(title, state, content) {
+      $("result").style.display = "block";
+      $("title").textContent = title;
+      const body = $("body");
+      body.className = state;
+      if (state === "") body.innerHTML = render(content); else body.textContent = content;
+    }
+
+    async function call(path, payload) {
+      await Promise.race([warm, new Promise(r => setTimeout(r, 70000))]);
+      const r = await fetch(API_BASE + path, {
+        method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload)
+      });
+      const d = await r.json().catch(() => ({}));
+      if (!r.ok) throw new Error(d.error || "Something went wrong. Please try again.");
+      return d.result;
+    }
+
+    async function run(btn, title, path, payload, keep) {
+      const buttons = document.querySelectorAll("button");
+      buttons.forEach(b => b.disabled = true);
+      show(title, "loading", "Preparing this for you… the server may need a moment to wake the first time.");
+      try {
+        const out = await call(path, payload);
+        if (keep) lastText = out;
+        show(title, "", out);
+        $("translateBox").hidden = false;
+      } catch (e) {
+        show(title, "error", e.message);
+      } finally {
+        buttons.forEach(b => b.disabled = false);
+      }
+    }
+
+    const medicine = () => $("medicine").value.trim();
+    function needMedicine() {
+      if (medicine()) return false;
+      show("A small request", "error", "Please enter the name of a medicine first.");
+      $("translateBox").hidden = true;
+      return true;
+    }
+    $("btnInfo").onclick = () => !needMedicine() && run($("btnInfo"), "About this medicine", "/api/info", { medicine: medicine() }, true);
+    $("btnAnalysis").onclick = () => !needMedicine() && run($("btnAnalysis"), "Understanding the condition", "/api/analysis", { medicine: medicine() }, true);
+    $("btnTranslate").onclick = () => {
+      const language = $("language").value;
+      if (!lastText) return show("A small request", "error", "Generate some information first, then translate it.");
+      run($("btnTranslate"), "In " + language, "/api/translate", { text: lastText, language }, false);
+    };
+  </script>
+</body>
+</html>
