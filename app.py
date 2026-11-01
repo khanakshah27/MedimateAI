@@ -30,9 +30,18 @@ def _run(fn, *args):
         return jsonify({"result": fn(*args)})
     except RuntimeError as e:
         return jsonify({"error": str(e)}), 500
-    except Exception:
+    except Exception as e:
         app.logger.exception("Gemini request failed")
-        return jsonify({"error": "The assistant is unavailable right now. Please try again shortly."}), 502
+        name = type(e).__name__
+        hints = {
+            "PermissionDenied": "The Gemini API key was rejected. Check GEMINI_API_KEY on the server.",
+            "InvalidArgument": "The Gemini API key or request was invalid. Check GEMINI_API_KEY on the server.",
+            "Unauthenticated": "The Gemini API key was rejected. Check GEMINI_API_KEY on the server.",
+            "NotFound": "The configured Gemini model was not found.",
+            "ResourceExhausted": "The Gemini quota has been reached. Please try again later.",
+        }
+        msg = hints.get(name, "The assistant is unavailable right now. Please try again shortly.")
+        return jsonify({"error": msg, "detail": name}), 502
 
 
 @app.route("/")
