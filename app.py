@@ -37,7 +37,7 @@ def _run(fn, *args):
             "PermissionDenied": "The Gemini API key was rejected. Check GEMINI_API_KEY on the server.",
             "InvalidArgument": "The Gemini API key or request was invalid. Check GEMINI_API_KEY on the server.",
             "Unauthenticated": "The Gemini API key was rejected. Check GEMINI_API_KEY on the server.",
-            "NotFound": "The configured Gemini model was not found.",
+            "NotFound": "No Gemini model is available for this API key. Check that the key was created in Google AI Studio.",
             "ResourceExhausted": "The Gemini quota has been reached. Please try again later.",
         }
         msg = hints.get(name, "The assistant is unavailable right now. Please try again shortly.")

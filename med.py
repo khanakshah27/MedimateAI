@@ -35,16 +35,38 @@ def _configure():
         _configured = True
 
 
+_available = None
+
+
+def _available_models():
+    """Models this key can call for text generation, newest-looking flash models first."""
+    global _available
+    if _available is None:
+        found = [
+            m.name for m in genai.list_models()
+            if "generateContent" in m.supported_generation_methods
+        ]
+        flash = sorted((n for n in found if "flash" in n and "image" not in n and "tts" not in n), reverse=True)
+        _available = flash + [n for n in found if n not in flash]
+    return _available
+
+
+def _candidates():
+    available = _available_models()
+    wanted = [n for n in _model_names() if n in available]
+    return wanted + [n for n in available if n not in wanted][:6]
+
+
 def _generate(prompt):
     _configure()
     last_error = None
-    for name in _model_names():
+    for name in _candidates():
         try:
             response = genai.GenerativeModel(name).generate_content(prompt)
             return response.text.strip() if response.parts else "No response."
         except (ResourceExhausted, NotFound, ServiceUnavailable) as e:
             last_error = e  # try the next model
-    raise last_error
+    raise last_error or NotFound("No usable Gemini model is available for this API key.")
 
 
 def get_med_info(text):
